@@ -2,9 +2,17 @@ import Devices.AndroidDevice;
 import components.pageObject.Android.MainScreen;
 import components.pageObject.Android.Views.Buttons;
 import components.pageObject.Android.WifiPage;
+import components.pageObject.Android.dragdrop.BasicUsage;
+import components.pageObject.Android.dragdrop.DrragDropMainScreen;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.service.local.AppiumDriverLocalService;
+import io.appium.java_client.service.local.AppiumServiceBuilder;
+import io.appium.java_client.service.local.flags.GeneralServerFlag;
+import io.appium.java_client.touch.LongPressOptions;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.time.StopWatch;
@@ -17,6 +25,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.internal.TestResult;
 
+import java.io.File;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Log
@@ -115,8 +125,6 @@ public class AndroidTest {
     @Test
     public void touchActions() throws InterruptedException {
 
-
-
         AndroidDriver androidDriver = DriverProvider.crateAndroidDriver(Appiums.LOCAL_APPIUM, Caps.getAndroidCapWithActivity(AndroidDevice.HUAWEI20));
         Buttons buttons = new Buttons(androidDriver);
 
@@ -124,8 +132,6 @@ public class AndroidTest {
         Point buttonCorner = buttons.btnNormal.getLocation();
 
         TouchAction touchAction = new TouchAction(androidDriver);
-
-
 
 //        for(int i=0;i<5;i++){
 //            System.out.print("----------------------\n");
@@ -136,23 +142,62 @@ public class AndroidTest {
 //        }
 //
 
-
+/**NIE USUWAJ TO PONIZEJ FAJNIE DZIELI BUTTONA NA OBSZARY DO KLIKANIA*/
         AndroidElement btn = buttons.btnNormal;
         Rectangle btnRectangle = btn.getRect();
-        int sektor = btnRectangle.getWidth()/5;
+        int sektor = btnRectangle.getWidth() / 5;
         System.out.println(btnRectangle.getX());
 
-        btnRectangle.setY((btnRectangle.y)+((btnRectangle.height)/2));
+        btnRectangle.setY((btnRectangle.y) + ((btnRectangle.height) / 2));
 
-        for(int i=1;i<=5;i++){
+        for (int i = 1; i <= 5; i++) {
             btnRectangle.setX(btn.getLocation().x);
-            btnRectangle.setX(btnRectangle.x+(i*sektor));
+            btnRectangle.setX(btnRectangle.x + (i * sektor));
             System.out.println(btnRectangle.getX());
 
-        Point npoint = new Point(btnRectangle.x-(sektor/2), btnRectangle.y);
+            Point npoint = new Point(btnRectangle.x - (sektor / 2), btnRectangle.y);
 
-        touchAction.press(PointOption.point(npoint )).perform();
-        Thread.sleep(1000);
-    }}
+            touchAction.press(PointOption.point(npoint)).perform();
+            Thread.sleep(1000);
+        }
+    }
+
+    @Test
+    public void dragDrop() throws InterruptedException {
+
+        /**Start Appium z kodu*/
+
+//        AppiumDriverLocalService service = AppiumDriverLocalService.buildService(
+//                new AppiumServiceBuilder().usingDriverExecutable(new File("C:\\Program Files\\nodejs\\node.exe"))
+//                        .withAppiumJS(new File("C:\\Users\\wulff\\AppData\\Local\\Programs\\Appium\\resources\\app\\node_modules\\appium\\build\\lib\\main.js"))
+//                        .withLogFile(new File(System.getProperty("user.dir")+"\\src\\test\\resources\\logs\\log.txt"))
+//                        .withArgument(GeneralServerFlag.LOCAL_TIMEZONE).usingPort(4723));
+//
+//        service.start();
+//        service.stop();
+
+        AndroidDriver androidDriver = DriverProvider.crateAndroidDriver(Appiums.LOCAL_APPIUM, Caps.getAndroidCapWithAppPath(AndroidDevice.REALME));
+        androidDriver.manage().timeouts().implicitlyWait(20L, TimeUnit.SECONDS);
+        DrragDropMainScreen drragDropMainScreen = new DrragDropMainScreen(androidDriver);
+
+        drragDropMainScreen.getGoToDragDrop().click();
+
+        BasicUsage basicUsage = new BasicUsage(androidDriver);
+
+        AndroidElement controlToDrag1 = basicUsage.getControlsToDrag().get(0);
+        AndroidElement controlToDrag2 = basicUsage.getControlsToDrag().get(3);
+
+        TouchAction touchAction = new TouchAction(androidDriver);
+
+        /** To jest drag&drop ale też jest to SWIPE*/
+
+        /** SWIPE po elemenrach*/
+        touchAction.press(ElementOption.element(controlToDrag1)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(1000))).moveTo(ElementOption.element(controlToDrag2)).release().perform();
+
+
+        /** SWIPE po punktach elementów*/
+        touchAction.press(PointOption.point(controlToDrag1.getCenter())).waitAction(WaitOptions.waitOptions(Duration.ofMillis(5000))).moveTo(ElementOption.element(controlToDrag2)).release().perform();
+
+    }
 
 }

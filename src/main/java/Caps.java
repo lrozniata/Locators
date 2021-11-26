@@ -24,7 +24,8 @@ public class Caps {
         desiredCapabilities.setCapability(MobileCapabilityType.NO_RESET, true);
         desiredCapabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, "1000");
 
-        desiredCapabilities.setCapability(MobileCapabilityType.APP, "C:\\Programowanie\\Locators\\ApiDemos-debug.apk");
+//        desiredCapabilities.setCapability(MobileCapabilityType.APP, "C:\\Programowanie\\Locators\\ApiDemos-debug.apk");
+        desiredCapabilities.setCapability(MobileCapabilityType.APP, "C:\\Programowanie\\Locators\\com.mobeta.android.demodslv.apk");
 //    desiredCapabilities.setCapability(MobileCapabilityType.APP, "/Users/x355302/TestApp/ApiDemos-debug.apk");
         desiredCapabilities.setCapability("noSign", true);
         desiredCapabilities.setCapability("skipDeviceInitialization", true);
